@@ -1,6 +1,8 @@
 import streamlit as st
+from get_user_data import User
+from custom_errors import UserNotFoundError
 
-movie_genres = [None,
+movie_genres = ['All',
                 '(no genres listed)',
                 'Action',
                 'Adventure',
@@ -24,43 +26,52 @@ movie_genres = [None,
                 ]
 
 
-def run_streamlit():
+def main_app():
+    # Set the page title and header
     st.set_page_config(page_title="Movie Recommender", page_icon="🤖")
-    with st.form("Recommend me!"):
-        st.header("Enter below info")
-        user_id = st.text_input("Enter User id: ", "", max_chars=4)
-        genre = st.selectbox("Select movie genre", movie_genres)
-        submit_btn = st.form_submit_button("Recommend me!")
+    st.title("Streamlit Netflix 🎈")
 
-        if submit_btn:
-            with st.spinner('Wait for it...'):
-                from get_movies import UIMovieRecommendation
-                data_input = {
-                    "user_id": user_id,
-                    "genre": genre
-                }
+    """
+    Wanna chill and enjoy some movies?
+    """
 
-                try:
-                    recommended_movies = UIMovieRecommendation(
-                    data=data_input
-                    ).get_recommended_movies()
-                except Exception as e:
-                    st.error(e)
-                else:
-                    st.table(recommended_movies)
+    with st.sidebar.form("recommend"):
+        # Create a sidebar with a search field and a dropdown for filtering by genre
+        user_id = st.text_input("Enter Spotlight user id", key="user")
+        sub_btn = st.form_submit_button("Recommend!")
+        st.session_state["user_id"] = user_id
 
-    if st.button("New user?"):
-        with st.form("Add information"):
-            user_mail = st.text_input("email adress")
-            favorite_movie = st.text_input("Your favorite movie is...")
-            if st.form_submit_button("send"):
-                with st.spinner('Welcome! Please make yourself comfortable till I...'):
-                    ##some code to update our user database
-                    ###some code to email user_id
-                    st.text("Congrats! Check the mailbox for your user_id!")
-                    import time
-                    time.sleep(3)
+    ##Check if user exists in our DB
+    if sub_btn:
+        valid_user = False
+        user_obj = User(st.session_state["user_id"])
+        try:
+            user_obj.check_user()
+        except UserNotFoundError as e:
+            st.error(e)
+        else:
+            valid_user = True
+            st.session_state
+            st.session_state["selected_genre"] = "All"
+
+    if valid_user:
+        f"""#welcome {st.session_state['user_id']}"""
+
+        # Get movies from backend
+        movies = user_obj.get_recommended_movies()
+        st.sidebar.selectbox("Filter by genre", movie_genres, key="genre_box")
+
+        # Use a list comprehension to filter the movies and TV shows based on the search term and genre
+        filtered_movies_and_tv_shows = [
+            movie for movie in movies
+            if st.session_state["selected_genre"] == "All" or movie["genre"] == st.session_state["selected_genre"]
+        ]
+
+        # Display the filtered movies and TV shows as a list. Include rating button
+        for movie in filtered_movies_and_tv_shows:
+            st.slider(movie["title"], min_value=0, max_value=5, key=f"{movie['title']}_slider")
+            st.button("Rate this movie", key=f"rate_{movie['title']}_btn")
 
 
 if __name__ == "__main__":
-    run_streamlit()
+    main_app()
