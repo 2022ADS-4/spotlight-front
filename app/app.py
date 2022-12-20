@@ -41,9 +41,10 @@ def main_app():
         sub_btn = st.form_submit_button("Recommend!")
         st.session_state["user_id"] = user_id
 
+        valid_user = False
+
     ##Check if user exists in our DB
     if sub_btn:
-        valid_user = False
         user_obj = User(st.session_state["user_id"])
         try:
             user_obj.check_user()
@@ -58,7 +59,7 @@ def main_app():
         f"""#welcome {st.session_state['user_id']}"""
 
         # Get movies from backend
-        movies = user_obj.get_recommended_movies()
+        movies = user_obj.get_recommended_movies
         st.sidebar.selectbox("Filter by genre", movie_genres, key="genre_box")
 
         # Use a list comprehension to filter the movies and TV shows based on the search term and genre
