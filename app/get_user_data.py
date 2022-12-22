@@ -15,8 +15,9 @@ class User:
     def post_movie_rating(self, movie_id, rating):
         requests.post(f"{self.RECOMMENDER_URL}/rating",
                       params={
-                          "movie_id" : movie_id,
-                          "rating" : rating
+                          "user_id": self.user_id,
+                          "movie_id": movie_id,
+                          "rating": rating
                       })
 
     @staticmethod

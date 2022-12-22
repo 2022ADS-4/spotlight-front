@@ -29,7 +29,7 @@ movie_genres = ['All',
 def main_app():
     # Set the page title and header
     st.set_page_config(page_title="Movie Recommender", page_icon="🤖")
-    st.title("Streamlit Netflix 🎈")
+    st.title("Streamflix 🎈")
 
     """
     Wanna chill and enjoy some movies?
