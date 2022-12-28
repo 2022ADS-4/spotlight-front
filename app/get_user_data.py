@@ -13,7 +13,7 @@ class User:
         return requests.get(f"{self.RECOMMENDER_URL}/get_movies", params={"user_id":self.user_id}).json()
 
     def post_movie_rating(self, movie_id, rating):
-        requests.post(f"{self.RECOMMENDER_URL}/rating",
+        return requests.post(f"{self.RECOMMENDER_URL}/rating",
                       params={
                           "user_id": self.user_id,
                           "movie_id": movie_id,
